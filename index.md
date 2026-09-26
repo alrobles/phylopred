@@ -60,5 +60,7 @@ Fish Tree of Life.
   modeling. *Ecological Modelling*, 213, 63-72.
 - Rabosky, D. L. et al. (2018). An inverse latitudinal gradient in
   speciation rate for marine fishes. *Nature*, 559, 392-395.
-- cofid: curated copepod-fish interaction database.
-  <https://github.com/alrobles/cofid>
+- Morales-Serna, F. N. (2025). Global patterns of modularity and narrow
+  host use in fish-parasitic copepods (Crustacea). *Biodiversity Data
+  Journal*, 13, e163693. <https://doi.org/10.3897/BDJ.13.e163693> —
+  basis of the cofid database (<https://github.com/alrobles/cofid>)
