@@ -60,3 +60,5 @@ Fish Tree of Life.
   modeling. *Ecological Modelling*, 213, 63-72.
 - Rabosky, D. L. et al. (2018). An inverse latitudinal gradient in
   speciation rate for marine fishes. *Nature*, 559, 392-395.
+- cofid: curated copepod-fish interaction database.
+  <https://github.com/alrobles/cofid>

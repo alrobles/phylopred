@@ -710,3 +710,5 @@ not a classical ROC against confirmed negatives.
 - Tinoco-Domínguez, E., Amancio, G., Robles-Fernández, Á. L. &
   Lira-Noriega, A. (2025). Interaction network of *Phoradendron* and its
   hosts. *American Journal of Botany*, e70025.
+- cofid: curated copepod-fish interaction database.
+  <https://github.com/alrobles/cofid>
