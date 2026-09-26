@@ -20,11 +20,11 @@ predicts new hosts for a parasite from its known hosts:
 ## Installation
 
 ``` r
+
 remotes::install_github("alrobles/phylopred")
-\n# View the documentation
-vignette("phylopred")
-# Or visit: https://alrobles.github.io/phylopred/
 ```
+
+Documentation site: <https://alrobles.github.io/phylopred/>
 
 ## Example
 

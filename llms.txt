@@ -20,11 +20,11 @@ predicts new hosts for a parasite from its known hosts:
 ## Installation
 
 ``` r
+
 remotes::install_github("alrobles/phylopred")
-\n# View the documentation
-vignette("phylopred")
-# Or visit: https://alrobles.github.io/phylopred/
 ```
+
+Documentation site: <https://alrobles.github.io/phylopred/>
 
 ## Example
 
@@ -110,3 +110,9 @@ Fish Tree of Life.
 - [`validate_host_prediction()`](https://alrobles.github.io/phylopred/reference/validate_host_prediction.md)
   : Leave-hosts-out validation of host predictions
 
+# Articles
+
+### All vignettes
+
+- [Comparing clades: Caligus vs Lepeophtheirus sea lice on marine
+  fishes](https://alrobles.github.io/phylopred/articles/caligus-vs-lepeophtheirus.md):
