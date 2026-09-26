@@ -62,5 +62,5 @@ Fish Tree of Life.
 - Morales-Serna, F. N. (2025). Global patterns of modularity and
   narrow host use in fish-parasitic copepods (Crustacea).
   *Biodiversity Data Journal*, 13, e163693.
-  https://doi.org/10.3897/BDJ.13.e163693 — basis of the 
+  https://doi.org/10.3897/BDJ.13.e163693 — basis of the cofid
   database (https://github.com/alrobles/cofid)
