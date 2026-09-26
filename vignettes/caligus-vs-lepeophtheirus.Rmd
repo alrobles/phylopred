@@ -1,0 +1,221 @@
+---
+title: "Comparing clades: Caligus vs Lepeophtheirus sea lice on marine fishes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comparing clades: Caligus vs Lepeophtheirus sea lice on marine fishes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+has_cofid <- requireNamespace("cofid", quietly = TRUE)
+```
+
+This vignette shows the full phylopred v2 workflow on a real host-parasite
+system: sea lice (Copepoda: Caligidae) parasitizing marine fishes. We ask
+whether the probability that two fish species share a sea louse decays
+faster with host phylogenetic distance in *Lepeophtheirus* than in
+*Caligus* — i.e., whether *Lepeophtheirus* is a phylogenetic specialist
+and *Caligus* a generalist.
+
+Interaction records come from the
+[cofid](https://github.com/alrobles/cofid) package (copepod-fish
+interaction database) and the host phylogeny from the
+[Fish Tree of Life](https://fishtreeoflife.org/) (Rabosky et al. 2018),
+pruned to the recorded hosts and shipped as the `fish_tree` data object.
+
+```{r setup, eval = has_cofid}
+library(phylopred)
+library(ape)
+```
+
+## 1. Interaction data
+
+We keep one record per copepod species / fish species pair and derive
+the copepod genus, which is the clade-level grouping we want to compare.
+
+```{r data, eval = has_cofid}
+interactions <- cofid::cofid
+interactions$genus <- sub(" .*", "", interactions$source_taxon_name)
+interactions <- interactions[
+  interactions$genus %in% c("Caligus", "Lepeophtheirus"),
+  c("source_taxon_name", "target_taxon_name", "genus")
+]
+table(unique(interactions[, c("source_taxon_name", "genus")])$genus)
+```
+
+## 2. Host phylogenetic distances
+
+`fish_tree` is already pruned to the recorded hosts present in the Fish
+Tree of Life; its cophenetic matrix gives the phylogenetic distance
+between every pair of hosts.
+
+```{r phydist, eval = has_cofid}
+data(fish_tree)
+phydist <- cophenetic(fish_tree)
+dim(phydist)
+```
+
+## 3. Pairwise host-sharing data
+
+`prepare_pair_data()` expands the interaction table into all
+(focal host, target host) pairs per parasite. Every known host is used
+as a focal host — unlike the legacy workflow, which sampled a single
+focal host per parasite — so the data set is deterministic and uses all
+available information.
+
+```{r pairs, eval = has_cofid}
+pairs <- prepare_pair_data(interactions, phydist, group = "genus")
+nrow(pairs)
+head(pairs)
+```
+
+## 4. Comparing slopes between clades
+
+`compare_phylopred_slopes()` fits a single logistic regression with a
+genus-by-distance interaction and quantifies uncertainty with a
+parasite-level cluster bootstrap, which respects the non-independence
+of pairs that share a parasite.
+
+```{r compare, eval = has_cofid}
+cmp <- compare_phylopred_slopes(pairs, n_boot = 20, seed = 42)
+cmp
+```
+
+A more negative slope means the probability of sharing a parasite
+decays faster with phylogenetic distance. The *Lepeophtheirus* slope is
+steeper than the *Caligus* slope and the interaction term is negative,
+supporting the interpretation of *Lepeophtheirus* as a phylogenetic
+specialist and *Caligus* as a generalist.
+
+## 5. Predicted sharing curves
+
+```{r curves, eval = has_cofid}
+cf <- coef(cmp$fitted_model)
+d <- seq(0, max(pairs$phydist), length.out = 200)
+p_cal <- plogis(cf["(Intercept)"] + cf["phydist"] * d)
+p_lep <- plogis(cf["(Intercept)"] + cf["genusLepeophtheirus"] +
+                  (cf["phydist"] + cf["phydist:genusLepeophtheirus"]) * d)
+plot(d, p_cal, type = "l", col = "#1b9e77", lwd = 2, ylim = c(0, max(p_cal)),
+     xlab = "Host phylogenetic distance",
+     ylab = "P(sharing a sea louse)")
+lines(d, p_lep, col = "#d95f02", lwd = 2)
+legend("topright", legend = c("Caligus (generalist)",
+                              "Lepeophtheirus (specialist)"),
+       col = c("#1b9e77", "#d95f02"), lwd = 2, bty = "n")
+```
+
+## 6. Model capacity and joint uncertainty
+
+`evaluate_phylopred_model()` reports pseudo-R² and AUC (optionally with a
+parasite-grouped cross-validation, which measures the ability to predict
+the host range of unseen parasites), and
+`phylopred_confidence_ellipse()` gives the joint confidence region of
+intercept and slope from the cluster bootstrap.
+
+```{r evaluate, eval = has_cofid}
+evaluate_phylopred_model(pairs)
+```
+
+```{r ellipse, eval = has_cofid}
+ell <- phylopred_confidence_ellipse(cmp$bootstrap)
+plot(ell, type = "l",
+     main = "95% joint confidence ellipse (cluster bootstrap)")
+points(t(attr(ell, "center")), pch = 19)
+```
+
+## 7. Presence-only threshold metrics: f_gamma and partial ROC
+
+Interaction data are presence-only: unrecorded host-parasite pairs are
+unlabeled, not true absences. `host_threshold_metric()` adapts the
+SDM threshold metric \(f_\gamma(t) = a/(\gamma b + c)\) to phylogenies —
+`a` is the sensitivity over known hosts and `b` the fraction of all
+species in the phylogeny predicted as hosts — and
+`phylo_partial_roc()` gives the Peterson-Papes-Soberon partial AUC
+ratio against a null (random-ranking) model.
+
+```{r fgamma, eval = has_cofid}
+fit <- glm(suscept ~ phydist, data = pairs, family = binomial())
+example_parasite <- names(sort(table(pairs$parasite), decreasing = TRUE))[1]
+one <- pairs[pairs$parasite == example_parasite, ]
+one$pred <- predict(fit, newdata = one, type = "response")
+# Suitability of each target species: best score across the parasite's
+# known focal hosts
+agg <- aggregate(cbind(pred, suscept) ~ target, data = one, FUN = max)
+
+m <- host_threshold_metric(agg$pred, agg$suscept, gamma = 1)
+m
+plot(m)
+```
+
+With `gamma = 1`, `f_gamma` can be read as a phylogenetic efficiency:
+known hosts retained per unit of phylogeny predicted as suitable.
+
+In Peterson, Papes & Soberon (2008) the tolerance `E` bounds the
+omission error on the y axis, motivated by the known georeferencing /
+identification error of occurrence databases. For interaction records we
+do not know that error, so `E` is simply the omission we are willing to
+tolerate; a large value (here `E = 0.95`) uses essentially the whole
+curve, so the ratio compares the full presence-only AUC against the
+random-ranking null.
+
+```{r partialroc, eval = has_cofid}
+roc <- phylo_partial_roc(agg$pred, agg$suscept, error_rate = 0.95,
+                         n_boot = 200, seed = 42)
+roc
+plot(roc)
+```
+
+## 8. Positive-unlabeled prediction with xplus
+
+The pairwise GLM scores every candidate host through a parametric
+curve in phylogenetic distance. `fit_phylopred_pu()` is a parallel,
+non-parametric route: known hosts of one parasite are the positives,
+every other tip of the phylogeny is unlabeled (not a confirmed
+absence), and an iterative PU learner (`xplus`) is trained on
+phylogenetic features (minimum and mean distance to the known hosts
+plus PCoA axes of the tree).
+
+```{r pu, eval = has_cofid}
+pu <- fit_phylopred_pu(interactions, phydist, example_parasite,
+                    seed = 42, max_iter = 30)
+pu
+m_pu <- host_threshold_metric(pu$prediction$pred, pu$prediction$is_host)
+roc_pu <- phylo_partial_roc(pu$prediction$pred, pu$prediction$is_host,
+                            error_rate = 0.95, n_boot = 200, seed = 42)
+roc_pu
+```
+
+Because the unlabeled species are not true absences, in-sample
+classification metrics overstate performance. `validate_host_prediction()`
+hides a fraction of the known hosts, refits, and measures how well the
+model ranks the hidden hosts above truly unlabeled species:
+
+```{r holdout, eval = has_cofid}
+validate_host_prediction(interactions, phydist, example_parasite,
+                         method = "glm", n_rep = 5, seed = 42)
+validate_host_prediction(interactions, phydist, example_parasite,
+                         method = "pu", n_rep = 5, seed = 42, max_iter = 20)
+```
+
+This holdout AUC is a ranking/recovery score against unlabeled species,
+not a classical ROC against confirmed negatives.
+
+## References
+
+- Robles-Fernández, Á. L. & Lira-Noriega, A. (2017). Combining
+  phylogenetic and occurrence information for risk assessment of pest
+  and pathogen interactions with host plants. *Frontiers in Applied
+  Mathematics and Statistics*, 3:17.
+  [doi:10.3389/fams.2017.00017](https://doi.org/10.3389/fams.2017.00017)
+- Rabosky, D. L. et al. (2018). An inverse latitudinal gradient in
+  speciation rate for marine fishes. *Nature*, 559, 392-395.
+- Tinoco-Domínguez, E., Amancio, G., Robles-Fernández, Á. L. &
+  Lira-Noriega, A. (2025). Interaction network of *Phoradendron* and its
+  hosts. *American Journal of Botany*, e70025.
