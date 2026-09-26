@@ -7,3 +7,4 @@
 ^cran-comments\.md$
 ^paper$
 ^vignettes/articles$
+^_pkgdown\.yml$
