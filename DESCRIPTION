@@ -1,0 +1,38 @@
+Package: phylopred
+Type: Package
+Title: Predicting Species Interactions from Phylogenetic Distance
+Version: 0.1.0
+Authors@R: c(
+    person("Angel", "Robles", , "a.l.robles.fernandez@gmail.com",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-4674-4270")))
+Description: Tools to model and predict host-parasite (and other pairwise
+    species) interactions from phylogenetic distance under presence-only
+    data. Provides pairwise host-sharing logistic models with
+    cluster-aware bootstrap and slope comparison between clades,
+    presence-only performance metrics (a threshold efficiency metric and
+    a phylogenetic partial ROC adapted from Peterson, Papes and Soberon
+    (2008) <doi:10.1016/j.ecolmodel.2007.11.008>), positive-unlabeled
+    host prediction, and leave-hosts-out validation. Methods build on
+    Robles-Fernandez and Lira-Noriega (2017) <doi:10.3389/fams.2017.00017>.
+License: MIT + file LICENSE
+URL: https://github.com/alrobles/phylopred, https://alrobles.github.io/phylopred/
+BugReports: https://github.com/alrobles/phylopred/issues
+Encoding: UTF-8
+LazyData: true
+Imports:
+    graphics,
+    stats,
+    utils,
+    xplus
+Suggests:
+    ape,
+    cofid,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Depends:
+    R (>= 4.1.0)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

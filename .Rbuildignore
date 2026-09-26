@@ -1,0 +1,9 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^\.github$
+^data-raw$
+^LICENSE\.md$
+^cran-comments\.md$
+^paper$
+^vignettes/articles$

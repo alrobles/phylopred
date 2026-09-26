@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+*.tar.gz
+*.Rcheck
+inst/doc
+vignettes/*_cache/
+vignettes/**/*_cache/
+vignettes/**/*_files/
+docs/
+*.Rproj
