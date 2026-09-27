@@ -5,7 +5,7 @@ Applies
 to every parasite in an interaction table, following the same expansion
 logic as
 [`prepare_pair_data`](https://alrobles.github.io/phylopred/reference/prepare_pair_data.md).
-Useful for contrasting Poulin and Mouillot's (2003) specificity index
+Useful for contrasting the Poulin and Mouillot (2003) specificity index
 against `phylopred`'s model-based host-range metric `b*`
 ([`host_threshold_metric`](https://alrobles.github.io/phylopred/reference/host_threshold_metric.md))
 across many parasites.

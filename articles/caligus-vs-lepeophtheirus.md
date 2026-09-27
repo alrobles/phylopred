@@ -10,8 +10,8 @@ specialist and *Caligus* a generalist.
 Interaction records come from the
 [cofid](https://github.com/alrobles/cofid) package (copepod-fish
 interaction database) and the host phylogeny from the [Fish Tree of
-Life](https://fishtreeoflife.org/) (Rabosky et al. 2018), pruned to the
-recorded hosts and shipped as the `fish_tree` data object.
+Life](https://fishtreeoflife.org/) (Rabosky and colleagues, 2018),
+pruned to the recorded hosts and shipped as the `fish_tree` data object.
 
 ``` r
 
@@ -705,8 +705,8 @@ not a classical ROC against confirmed negatives.
   and pathogen interactions with host plants. *Frontiers in Applied
   Mathematics and Statistics*, 3:17.
   [doi:10.3389/fams.2017.00017](https://doi.org/10.3389/fams.2017.00017)
-- Rabosky, D. L. et al. (2018). An inverse latitudinal gradient in
-  speciation rate for marine fishes. *Nature*, 559, 392-395.
+- Rabosky, D. L. and colleagues (2018). An inverse latitudinal gradient
+  in speciation rate for marine fishes. *Nature*, 559, 392-395.
 - Tinoco-Domínguez, E., Amancio, G., Robles-Fernández, Á. L. &
   Lira-Noriega, A. (2025). Interaction network of *Phoradendron* and its
   hosts. *American Journal of Botany*, e70025.

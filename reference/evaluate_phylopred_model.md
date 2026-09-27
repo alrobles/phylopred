@@ -44,7 +44,7 @@ An object of class `"phylopred_evaluation"`, a list with:
 
 - tjur_r2:
 
-  Tjur's coefficient of discrimination (mean fitted probability for 1s
+  Tjur coefficient of discrimination (mean fitted probability for 1s
   minus mean for 0s).
 
 - auc:

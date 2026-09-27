@@ -1,7 +1,7 @@
 # Beetle tree interaction table.
 
-A dataset of beetles and genues of host trees. Original information is
-avaliable in <https://www.barkbeetles.info/>
+A dataset of bark beetle species and their host tree genera. Original
+information is available in <https://www.barkbeetles.info/>
 
 ## Usage
 

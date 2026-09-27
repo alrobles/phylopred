@@ -1,4 +1,4 @@
-# Poulin & Mouillot's taxonomic/phylogenetic distinctness index (S_TD)
+# Poulin and Mouillot taxonomic/phylogenetic distinctness index (S_TD)
 
 Computes the average taxonomic (or phylogenetic) distinctness
 \\S\_{TD}\\ of Poulin and Mouillot (2003) for a single parasite's known

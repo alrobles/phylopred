@@ -50,7 +50,8 @@ phylo_partial_roc(
 - boot_prop:
 
   Proportion of known hosts resampled (with replacement) in each
-  bootstrap replicate, as in Peterson et al. Default 0.5.
+  bootstrap replicate, as in Peterson, Papes and Soberon (2008). Default
+  0.5.
 
 - seed:
 

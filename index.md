@@ -58,8 +58,8 @@ Fish Tree of Life.
 - Peterson, A. T., Papes, M. & Soberon, J. (2008). Rethinking receiver
   operating characteristic analysis applications in ecological niche
   modeling. *Ecological Modelling*, 213, 63-72.
-- Rabosky, D. L. et al. (2018). An inverse latitudinal gradient in
-  speciation rate for marine fishes. *Nature*, 559, 392-395.
+- Rabosky, D. L. and colleagues (2018). An inverse latitudinal gradient
+  in speciation rate for marine fishes. *Nature*, 559, 392-395.
 - Morales-Serna, F. N. (2025). Global patterns of modularity and narrow
   host use in fish-parasitic copepods (Crustacea). *Biodiversity Data
   Journal*, 13, e163693. <https://doi.org/10.3897/BDJ.13.e163693> —

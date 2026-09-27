@@ -34,7 +34,7 @@
 - [`phylopred_confidence_ellipse()`](https://alrobles.github.io/phylopred/reference/phylopred_confidence_ellipse.md)
   : Joint confidence ellipse for intercept and slope
 - [`poulin_std()`](https://alrobles.github.io/phylopred/reference/poulin_std.md)
-  : Poulin & Mouillot's taxonomic/phylogenetic distinctness index (S_TD)
+  : Poulin and Mouillot taxonomic/phylogenetic distinctness index (S_TD)
 - [`predict_phylopred_probability()`](https://alrobles.github.io/phylopred/reference/predict_phylopred_probability.md)
   : Predict host susceptibility probabilities from logistic regression
   coefficients
