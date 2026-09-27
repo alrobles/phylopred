@@ -1,0 +1,243 @@
+---
+title: "Specialist vs generalist copepods: Caligus and Lepeophtheirus"
+output: rmarkdown::html_document
+bibliography: ../../paper/refs.bib
+vignette: >
+  %\VignetteIndexEntry{Specialist vs generalist copepods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  cache = TRUE
+)
+set.seed(42)
+```
+
+This article walks through the full `phylopred` workflow on a real
+use case: contrasting a *generalist* sea-louse genus (*Caligus*)
+against a more *specialist* one (*Lepeophtheirus*), using curated
+copepod–fish interactions from the
+[`cofid`](https://github.com/alrobles/cofid) database and host
+phylogenetic distances from the Fish Tree of Life
+(Rabosky et al. 2018; distributed with the package as `fish_tree`,
+CC0). In the multi-genus comparative sweep these two genera sit at
+opposite ends of the phylogenetic host-range gradient
+(median $b^*$ = 0.266 for *Caligus* vs 0.140 for *Lepeophtheirus*).
+
+Everything below is presence-only: recorded interactions are
+positives, and fish without a record for a given parasite are treated
+as *unlabeled*, never as confirmed absences.
+
+```{r setup, message = FALSE}
+library(phylopred)
+library(cofid)
+library(ape)
+```
+
+## 1. Build the interaction table and the candidate universe
+
+We take all *Caligus* and *Lepeophtheirus* records from `cofid`,
+keep hosts present in `fish_tree`, and compute patristic distances.
+The pruned tree defines the *candidate host universe*: the set of
+species over which suitability is predicted and coverage is measured.
+
+```{r data}
+data(cofid, package = "cofid")
+
+genus <- sub(" .*", "", cofid$source_taxon_name)
+keep <- genus %in% c("Caligus", "Lepeophtheirus")
+
+interactions <- unique(data.frame(
+  parasite = cofid$source_taxon_name[keep],
+  host     = cofid$target_taxon_name[keep],
+  genus    = genus[keep],
+  stringsAsFactors = FALSE
+))
+
+tips <- gsub("_", " ", fish_tree$tip.label)
+interactions <- interactions[interactions$host %in% tips, ]
+
+phydist <- cophenetic(fish_tree)
+rownames(phydist) <- colnames(phydist) <- gsub("_", " ", rownames(phydist))
+
+nrow(interactions)
+table(interactions$genus)
+```
+
+## 2. Probability of sharing vs phylogenetic distance
+
+`prepare_pair_data()` expands, for each parasite, all pairs between
+its known hosts and the candidate universe. A single logistic model
+with a genus × distance interaction tests whether the two genera
+decay differently — the formal replacement for comparing two
+separately fitted regressions.
+
+```{r slopes}
+pairs <- prepare_pair_data(interactions, phydist, group = "genus")
+cmp <- compare_phylopred_slopes(pairs, n_boot = 200, seed = 42)
+cmp
+```
+
+A more negative slope means the probability of sharing a parasite
+falls faster with phylogenetic distance — the specialist signature.
+The cluster bootstrap resamples whole parasites, honestly propagating
+the between-parasite heterogeneity into the intervals.
+
+```{r curves, fig.cap = "Probability-of-sharing decay per genus."}
+fit <- cmp$fitted_model
+d <- seq(0, max(pairs$phydist), length.out = 200)
+newdat <- rbind(
+  data.frame(phydist = d, group = "Caligus"),
+  data.frame(phydist = d, group = "Lepeophtheirus")
+)
+newdat$p <- predict(fit, newdata = newdat, type = "response")
+
+plot(NULL, xlim = range(d), ylim = range(newdat$p),
+     xlab = "Phylogenetic distance", ylab = "P(share parasite)")
+lines(d, newdat$p[newdat$group == "Caligus"], col = "firebrick", lwd = 2)
+lines(d, newdat$p[newdat$group == "Lepeophtheirus"], col = "steelblue", lwd = 2)
+legend("topright", legend = c("Caligus (generalist)",
+                              "Lepeophtheirus (specialist)"),
+       col = c("firebrick", "steelblue"), lwd = 2, bty = "n")
+```
+
+## 3. Positive–unlabeled host prediction
+
+For one well-sampled parasite of each genus we fit the PU classifier
+(`xplus` engine) on phylogenetic features: minimum and mean distance
+to the known hosts plus PCoA axes of the host distance matrix.
+
+```{r pick}
+host_counts <- sort(table(interactions$parasite), decreasing = TRUE)
+head(host_counts)
+
+caligus_sp <- "Caligus elongatus"
+lepeo_sp   <- grep("^Lepeophtheirus", names(host_counts), value = TRUE)[1]
+lepeo_sp
+```
+
+```{r pu, message = FALSE}
+pu_cal <- fit_phylopred_pu(interactions, phydist, parasite = caligus_sp,
+                           seed = 42)
+pu_lep <- fit_phylopred_pu(interactions, phydist, parasite = lepeo_sp,
+                           seed = 42)
+pu_cal
+head(pu_cal$prediction[order(-pu_cal$prediction$pred), ])
+```
+
+## 4. Presence-only performance and phylogenetic host range
+
+`host_threshold_metric()` computes, over all thresholds $t$, the
+efficiency $f_\gamma(t) = a/(\gamma b + c)$ where $a$ is the fraction
+of known hosts retained, $b$ the fraction of the candidate phylogeny
+predicted suitable, and $c = 1 - a$. The coverage $b^*$ at the
+optimum is the *phylogenetic host range* — our generalism measure.
+
+```{r fgamma}
+m_cal <- host_threshold_metric(pu_cal$prediction$pred, pu_cal$prediction$is_host)
+m_lep <- host_threshold_metric(pu_lep$prediction$pred, pu_lep$prediction$is_host)
+
+summarize_fgamma <- function(m, parasite) {
+  best <- which.max(m$f_gamma)
+  data.frame(parasite = parasite,
+             f_star = attr(m, "optimal_f"),
+             t_star = attr(m, "optimal_threshold"),
+             host_range = m$b[best],
+             sensitivity = m$a[best])
+}
+rbind(summarize_fgamma(m_cal, caligus_sp),
+      summarize_fgamma(m_lep, lepeo_sp))
+```
+
+```{r fgamma-plot, fig.cap = "f_gamma efficiency curves."}
+op <- par(mfrow = c(1, 2))
+plot(m_cal$threshold, m_cal$f_gamma, type = "s",
+     xlab = "threshold t", ylab = expression(f[gamma]), main = caligus_sp)
+abline(v = attr(m_cal, "optimal_threshold"), lty = 2)
+plot(m_lep$threshold, m_lep$f_gamma, type = "s",
+     xlab = "threshold t", ylab = expression(f[gamma]), main = lepeo_sp)
+abline(v = attr(m_lep, "optimal_threshold"), lty = 2)
+par(op)
+```
+
+The phylogenetic partial ROC compares the sensitivity–coverage curve
+against the null diagonal $a = b$ (a random ranking of species). We
+use `error_rate = 0.95` — since the database error rate is unknown,
+$E$ is the omission we are willing to tolerate, and 0.95 uses
+essentially the full curve.
+
+```{r proc, fig.cap = "Phylogenetic partial ROC for the two parasites."}
+roc_cal <- phylo_partial_roc(pu_cal$prediction$pred, pu_cal$prediction$is_host,
+                             error_rate = 0.95, n_boot = 200, seed = 42)
+roc_lep <- phylo_partial_roc(pu_lep$prediction$pred, pu_lep$prediction$is_host,
+                             error_rate = 0.95, n_boot = 200, seed = 42)
+
+op <- par(mfrow = c(1, 2))
+plot(roc_cal)
+mtext(caligus_sp, side = 3, line = -1, cex = 0.8)
+plot(roc_lep)
+mtext(lepeo_sp, side = 3, line = -1, cex = 0.8)
+par(op)
+
+c(caligus = roc_cal$auc_ratio, lepeophtheirus = roc_lep$auc_ratio)
+```
+
+AUC ratios above 1 mean known hosts are ranked above unlabeled
+species more often than chance. This is a ranking statement — not
+discrimination against true absences, which we do not have.
+
+## 5. Out-of-sample validation: hiding known hosts
+
+The decisive test of predictive value hides 25% of each parasite's
+known hosts, refits on the remainder, and asks how well the hidden
+hosts outrank never-observed species (Mann–Whitney AUC).
+
+```{r holdout}
+val_cal <- validate_host_prediction(interactions, phydist,
+                                    parasite = caligus_sp, method = "pu",
+                                    prop_holdout = 0.25, n_rep = 5,
+                                    seed = 42)
+val_lep <- validate_host_prediction(interactions, phydist,
+                                    parasite = lepeo_sp, method = "pu",
+                                    prop_holdout = 0.25, n_rep = 5,
+                                    seed = 42)
+
+data.frame(
+  parasite    = c(caligus_sp, lepeo_sp),
+  holdout_auc = c(mean(val_cal$auc, na.rm = TRUE),
+                  mean(val_lep$auc, na.rm = TRUE)),
+  sd          = c(sd(val_cal$auc, na.rm = TRUE),
+                  sd(val_lep$auc, na.rm = TRUE))
+)
+```
+
+## 6. Benchmark: Poulin & Mouillot's $S_{TD}$
+
+As a model-free cross-check we compute Poulin & Mouillot's (2003)
+phylogenetic distinctness of each parasite's realized host set, using
+the same patristic distances.
+
+```{r std}
+spec <- host_specificity_index(interactions, phydist, group = "genus")
+spec <- spec[!is.na(spec$std), ]
+aggregate(std ~ group, data = spec, FUN = median)
+```
+
+Higher $S_{TD}$ = realized hosts more spread across the tree. In the
+full comparative study $b^*$ and $S_{TD}$ correlate positively
+(Spearman $\rho$ = 0.55–0.74) while capturing different constructs:
+$b^*$ measures the *predicted suitable fraction* of the candidate
+phylogeny at the model's optimal threshold, $S_{TD}$ only the spread
+of the hosts already observed.
+
+## Session info
+
+```{r session}
+sessionInfo()
+```
