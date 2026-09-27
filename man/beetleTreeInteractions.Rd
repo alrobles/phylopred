@@ -18,8 +18,8 @@ A data frame with 565 rows and 2 variables:
 beetleTreeInteractions
 }
 \description{
-A dataset of beetles and genues of host trees. Original information
-is avaliable in \url{https://www.barkbeetles.info/}
+A dataset of bark beetle species and their host tree genera. Original
+information is available in \url{https://www.barkbeetles.info/}
 }
 \details{
 We use this interaction tables to construct an incidence matrix.

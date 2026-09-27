@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.height = 5
 )
-has_cofid <- requireNamespace("cofid", quietly = TRUE)
+has_pkgs <- requireNamespace("cofid", quietly = TRUE) &&
+  requireNamespace("ape", quietly = TRUE)
 ```
 
 This vignette shows the full phylopred v2 workflow on a real host-parasite
@@ -27,10 +28,10 @@ and *Caligus* a generalist.
 Interaction records come from the
 [cofid](https://github.com/alrobles/cofid) package (copepod-fish
 interaction database) and the host phylogeny from the
-[Fish Tree of Life](https://fishtreeoflife.org/) (Rabosky et al. 2018),
+[Fish Tree of Life](https://fishtreeoflife.org/) (Rabosky and colleagues, 2018),
 pruned to the recorded hosts and shipped as the `fish_tree` data object.
 
-```{r setup, eval = has_cofid}
+```{r setup, eval = has_pkgs}
 library(phylopred)
 library(ape)
 ```
@@ -40,7 +41,7 @@ library(ape)
 We keep one record per copepod species / fish species pair and derive
 the copepod genus, which is the clade-level grouping we want to compare.
 
-```{r data, eval = has_cofid}
+```{r data, eval = has_pkgs}
 interactions <- cofid::cofid
 interactions$genus <- sub(" .*", "", interactions$source_taxon_name)
 interactions <- interactions[
@@ -56,7 +57,7 @@ table(unique(interactions[, c("source_taxon_name", "genus")])$genus)
 Tree of Life; its cophenetic matrix gives the phylogenetic distance
 between every pair of hosts.
 
-```{r phydist, eval = has_cofid}
+```{r phydist, eval = has_pkgs}
 data(fish_tree)
 phydist <- cophenetic(fish_tree)
 dim(phydist)
@@ -70,7 +71,7 @@ as a focal host — unlike the legacy workflow, which sampled a single
 focal host per parasite — so the data set is deterministic and uses all
 available information.
 
-```{r pairs, eval = has_cofid}
+```{r pairs, eval = has_pkgs}
 pairs <- prepare_pair_data(interactions, phydist, group = "genus")
 nrow(pairs)
 head(pairs)
@@ -83,7 +84,7 @@ genus-by-distance interaction and quantifies uncertainty with a
 parasite-level cluster bootstrap, which respects the non-independence
 of pairs that share a parasite.
 
-```{r compare, eval = has_cofid}
+```{r compare, eval = has_pkgs}
 cmp <- compare_phylopred_slopes(pairs, n_boot = 20, seed = 42)
 cmp
 ```
@@ -96,7 +97,7 @@ specialist and *Caligus* as a generalist.
 
 ## 5. Predicted sharing curves
 
-```{r curves, eval = has_cofid}
+```{r curves, eval = has_pkgs}
 cf <- coef(cmp$fitted_model)
 d <- seq(0, max(pairs$phydist), length.out = 200)
 p_cal <- plogis(cf["(Intercept)"] + cf["phydist"] * d)
@@ -119,11 +120,11 @@ the host range of unseen parasites), and
 `phylopred_confidence_ellipse()` gives the joint confidence region of
 intercept and slope from the cluster bootstrap.
 
-```{r evaluate, eval = has_cofid}
+```{r evaluate, eval = has_pkgs}
 evaluate_phylopred_model(pairs)
 ```
 
-```{r ellipse, eval = has_cofid}
+```{r ellipse, eval = has_pkgs}
 ell <- phylopred_confidence_ellipse(cmp$bootstrap)
 plot(ell, type = "l",
      main = "95% joint confidence ellipse (cluster bootstrap)")
@@ -140,7 +141,7 @@ species in the phylogeny predicted as hosts — and
 `phylo_partial_roc()` gives the Peterson-Papes-Soberon partial AUC
 ratio against a null (random-ranking) model.
 
-```{r fgamma, eval = has_cofid}
+```{r fgamma, eval = has_pkgs}
 fit <- glm(suscept ~ phydist, data = pairs, family = binomial())
 example_parasite <- names(sort(table(pairs$parasite), decreasing = TRUE))[1]
 one <- pairs[pairs$parasite == example_parasite, ]
@@ -165,7 +166,7 @@ tolerate; a large value (here `E = 0.95`) uses essentially the whole
 curve, so the ratio compares the full presence-only AUC against the
 random-ranking null.
 
-```{r partialroc, eval = has_cofid}
+```{r partialroc, eval = has_pkgs}
 roc <- phylo_partial_roc(agg$pred, agg$suscept, error_rate = 0.95,
                          n_boot = 200, seed = 42)
 roc
@@ -182,7 +183,7 @@ absence), and an iterative PU learner (`xplus`) is trained on
 phylogenetic features (minimum and mean distance to the known hosts
 plus PCoA axes of the tree).
 
-```{r pu, eval = has_cofid}
+```{r pu, eval = has_pkgs}
 pu <- fit_phylopred_pu(interactions, phydist, example_parasite,
                     seed = 42, max_iter = 30)
 pu
@@ -197,7 +198,7 @@ classification metrics overstate performance. `validate_host_prediction()`
 hides a fraction of the known hosts, refits, and measures how well the
 model ranks the hidden hosts above truly unlabeled species:
 
-```{r holdout, eval = has_cofid}
+```{r holdout, eval = has_pkgs}
 validate_host_prediction(interactions, phydist, example_parasite,
                          method = "glm", n_rep = 5, seed = 42)
 validate_host_prediction(interactions, phydist, example_parasite,
@@ -214,7 +215,7 @@ not a classical ROC against confirmed negatives.
   and pathogen interactions with host plants. *Frontiers in Applied
   Mathematics and Statistics*, 3:17.
   [doi:10.3389/fams.2017.00017](https://doi.org/10.3389/fams.2017.00017)
-- Rabosky, D. L. et al. (2018). An inverse latitudinal gradient in
+- Rabosky, D. L. and colleagues (2018). An inverse latitudinal gradient in
   speciation rate for marine fishes. *Nature*, 559, 392-395.
 - Tinoco-Domínguez, E., Amancio, G., Robles-Fernández, Á. L. &
   Lira-Noriega, A. (2025). Interaction network of *Phoradendron* and its

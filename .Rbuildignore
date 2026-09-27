@@ -8,3 +8,4 @@
 ^paper$
 ^vignettes/articles$
 ^_pkgdown\.yml$
+^\.aspell$

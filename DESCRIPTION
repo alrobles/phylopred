@@ -11,8 +11,9 @@ Description: Tools to model and predict host-parasite (and other pairwise
     data. Provides pairwise host-sharing logistic models with
     cluster-aware bootstrap and slope comparison between clades,
     presence-only performance metrics (a threshold efficiency metric and
-    a phylogenetic partial ROC adapted from Peterson, Papes and Soberon
-    (2008) <doi:10.1016/j.ecolmodel.2007.11.008>), positive-unlabeled
+    a phylogenetic partial receiver operating characteristic (ROC) adapted
+    from Peterson, Papes and Soberon (2008)
+    <doi:10.1016/j.ecolmodel.2007.11.008>), positive-unlabeled
     host prediction, and leave-hosts-out validation. Methods build on
     Robles-Fernandez and Lira-Noriega (2017) <doi:10.3389/fams.2017.00017>.
 License: MIT + file LICENSE

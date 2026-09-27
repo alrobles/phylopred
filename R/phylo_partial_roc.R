@@ -23,7 +23,8 @@
 #'   \eqn{\ge 1 - E}. Default 0.05.
 #' @param n_boot Number of bootstrap replicates. Default 500.
 #' @param boot_prop Proportion of known hosts resampled (with replacement)
-#'   in each bootstrap replicate, as in Peterson et al. Default 0.5.
+#'   in each bootstrap replicate, as in Peterson, Papes and Soberon
+#'   (2008). Default 0.5.
 #' @param seed Integer or NULL. Random seed for the bootstrap. Default NULL.
 #'
 #' @return An object of class \code{"phylopred_partial_roc"}, a list with:

@@ -1,7 +1,7 @@
 #' Beetle tree interaction table.
 #'
-#' A dataset of beetles and genues of host trees. Original information
-#' is avaliable in \url{https://www.barkbeetles.info/}
+#' A dataset of bark beetle species and their host tree genera. Original
+#' information is available in \url{https://www.barkbeetles.info/}
 #'
 #' We use this interaction tables to construct an incidence matrix.
 #' This is a table representation of a bipartite graph

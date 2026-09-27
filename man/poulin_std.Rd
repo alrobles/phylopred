@@ -2,7 +2,7 @@
 % Please edit documentation in R/poulin_std.R
 \name{poulin_std}
 \alias{poulin_std}
-\title{Poulin & Mouillot's taxonomic/phylogenetic distinctness index (S_TD)}
+\title{Poulin and Mouillot taxonomic/phylogenetic distinctness index (S_TD)}
 \usage{
 poulin_std(phydist, hosts)
 }

@@ -17,7 +17,7 @@
 #' @return An object of class \code{"phylopred_evaluation"}, a list with:
 #' \describe{
 #'   \item{mcfadden_r2}{McFadden pseudo-R-squared, \eqn{1 - logLik(model)/logLik(null)}.}
-#'   \item{tjur_r2}{Tjur's coefficient of discrimination (mean fitted
+#'   \item{tjur_r2}{Tjur coefficient of discrimination (mean fitted
 #'     probability for 1s minus mean for 0s).}
 #'   \item{auc}{In-sample area under the ROC curve.}
 #'   \item{cv_auc}{Parasite-grouped k-fold cross-validated AUC (NA if

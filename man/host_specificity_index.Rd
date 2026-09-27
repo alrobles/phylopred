@@ -27,8 +27,8 @@ A data.frame of class \code{"phylopred_specificity"} with columns
 \description{
 Applies \code{\link{poulin_std}} to every parasite in an interaction
 table, following the same expansion logic as
-\code{\link{prepare_pair_data}}. Useful for contrasting Poulin and
-Mouillot's (2003) specificity index against \code{phylopred}'s
+\code{\link{prepare_pair_data}}. Useful for contrasting the Poulin and
+Mouillot (2003) specificity index against \code{phylopred}'s
 model-based host-range metric \code{b*}
 (\code{\link{host_threshold_metric}}) across many parasites.
 }
