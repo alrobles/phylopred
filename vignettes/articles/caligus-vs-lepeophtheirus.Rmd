@@ -1,10 +1,6 @@
 ---
 title: "Comparing clades: Caligus vs Lepeophtheirus sea lice on marine fishes"
 output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Comparing clades: Caligus vs Lepeophtheirus sea lice on marine fishes}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
