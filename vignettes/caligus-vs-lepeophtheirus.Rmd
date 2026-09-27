@@ -26,9 +26,8 @@ from the [cofid](https://github.com/alrobles/cofid) package (the curated
 copepod-fish interaction database of Morales-Serna 2025) and the host
 phylogeny from the [Fish Tree of Life](https://fishtreeoflife.org/) (Rabosky
 and colleagues, 2018), pruned to the recorded hosts and shipped as the
-`fish_tree` data object. The first sections run the full workflow live on the
-two best-sampled sea lice genera, *Caligus* and *Lepeophtheirus*; the final
-sections summarize the paper's full 16-genus, 90-parasite analysis.
+`fish_tree` data object. The vignette runs the full workflow live on the
+two best-sampled sea lice genera, *Caligus* and *Lepeophtheirus*.
 
 ## 1. Interaction data
 
@@ -214,47 +213,6 @@ phylopred::validate_host_prediction(interactions, phydist, example_parasite,
 This holdout AUC is a ranking/recovery score against unlabeled species,
 not a classical ROC against confirmed negatives.
 
-## 9. PU learning versus simple phylogenetic baselines
-
-The paper also compared the PU classifier against the simplest rules using
-the same information: a nearest-known-host baseline (ranking candidates by
-the negative minimum phylogenetic distance to the training hosts, with no
-fitting) and a univariate logistic regression on that same distance, on
-identical hidden-host splits (100 parasites with >= 8 hosts, 5 replicates
-each). The baselines are strong: median hidden-host AUC was 0.870 for
-nearest-known-host versus 0.867 for the PU model, and the PU model won in
-only 40 of 100 parasites (paired Wilcoxon p = 0.04 in favor of the
-baseline). Most interpolation performance in this system is attributable to
-raw phylogenetic proximity; the added value of the PU machinery is the
-bounded suitability score usable across parasites, the thresholded
-host-range summary $b^*$, and the presence-only performance framework.
-
-## 10. Protocol limit: how many known hosts are needed?
-
-Varying the number of training hosts ($n = 5, 10, 15, 20, 30, 40$) for the
-best-sampled parasites, the paper found hidden-host AUC near chance
-(0.44-0.61) at $n = 5$; the protocol becomes informative around
-$n \approx 10$-15 (0.58-0.74) and stabilizes at 0.75-0.81 for $n \ge 30$.
-The recommended minimum is 10 known hosts, ideally 15 or more — a stability
-zone, not a universal threshold.
-
-```{r protocol-limit, echo = FALSE, out.width = "85%", fig.cap = "Protocol limit: hidden-host recovery AUC as a function of the number of training hosts for the best-sampled parasites. Points are means over 5 replicate subsamples; error bars are the between-replicate standard deviation. The dashed line marks chance level (AUC = 0.5)."}
-knitr::include_graphics("figures/protocol_limit.png")
-```
-
-## 11. Predicted novel hosts
-
-The paper's strongest evidence for added value beyond raw proximity is the
-set of phylogenetically coherent, testable predictions: *Lepeophtheirus
-salmonis* is predicted on unrecorded salmonids (*Hucho* spp.,
-*Brachymystax lenok*) and esociforms (*Esox*, *Umbra*), consistent with
-reports of sea lice on pike-lineage fishes in brackish water; the flatfish
-specialist *L. pectoralis* is predicted on unrecorded *Citharichthys* and
-*Paralichthys* flounders; and *Caligus elongatus* extends into unrecorded
-monacanthid filefishes adjacent to its recorded hosts. These ranked
-candidate lists are hypotheses that field surveys or aquaculture monitoring
-can confirm or refute.
-
 ## References
 
 - Morales-Serna, F. N. (2025). Global patterns of modularity and narrow host
@@ -264,18 +222,8 @@ can confirm or refute.
 - Peterson, A. T., Papes, M. & Soberon, J. (2008). Rethinking receiver
   operating characteristic analysis applications in ecological niche
   modeling. *Ecological Modelling*, 213, 63-72.
-- Poulin, R. & Mouillot, D. (2003). Parasite specialization from a
-  phylogenetic perspective: a new index of host specificity.
-  *Parasitology*, 126, 473-480.
 - Rabosky, D. L. and colleagues (2018). An inverse latitudinal gradient in
   speciation rate for marine fishes. *Nature*, 559, 392-395.
-- Robles-Fernandez, A. L. & Lira-Noriega, A. (2017). Combining phylogenetic
-  and occurrence information for risk assessment of pest and pathogen
-  interactions with host plants. *Frontiers in Applied Mathematics and
-  Statistics*, 3:17. https://doi.org/10.3389/fams.2017.00017
-- Tinoco-Dominguez, E., Amancio, G., Robles-Fernandez, A. L. &
-  Lira-Noriega, A. (2025). Interaction network of *Phoradendron* and its
-  hosts. *American Journal of Botany*, e70025.
 - Zhou, J., Lu, X., Chang, W., Wan, C., Lu, X., Zhang, C. & Cao, S. (2022).
   PLUS: Predicting cancer metastasis potential based on positive and
   unlabeled learning. *PLoS Computational Biology*, 18(3), e1009956.
