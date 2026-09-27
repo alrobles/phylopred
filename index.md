@@ -49,6 +49,11 @@ See the vignette `caligus-vs-lepeophtheirus` for a complete real-data
 case study with the `cofid` copepod-fish interaction database and the
 Fish Tree of Life.
 
+## Manuscript
+
+The manuscript, supplementary material, and archived analysis results
+are maintained separately in the `phylopred-paper` repository.
+
 ## References
 
 - Robles-Fernandez, A. L. & Lira-Noriega, A. (2017). Combining
