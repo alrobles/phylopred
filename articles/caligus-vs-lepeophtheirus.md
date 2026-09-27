@@ -704,99 +704,7 @@ phylopred::validate_host_prediction(interactions, phydist, example_parasite,
 This holdout AUC is a ranking/recovery score against unlabeled species,
 not a classical ROC against confirmed negatives.
 
-## 9. The full copepod analysis: genus ranking and host range
-
-The live sections above show the workflow on two genera; the paper
-applies the same machinery to the complete cofid system (90 parasite
-species with at least 8 hosts in the tree, 16 genera). The figure below
-summarizes the fine sweep: median phylogenetic host range $`b^*`$
-(fraction of the 1,727-species candidate universe scored suitable at the
-$`f_\gamma`$-optimal threshold), median partial-ROC AUC ratio
-($`E = 0.95`$; 1 = null ranking, 2 = perfect), and median hidden-host
-recovery AUC (25% of hosts hidden, 20 replicates; error bars are the
-between-replicate SD). The right panel shows the genus-level
-probability-of-sharing decay curves; shallower decay indicates broader
-phylogenetic host use.
-
-![Phylogenetic host range and predictive performance across 16 copepod
-genera (90 parasite species). Left: median \$b^\*\$ (specialist to
-generalist gradient). Center: median partial-ROC AUC ratio (\$E=0.95\$).
-Right: median hidden-host recovery AUC. Points are genera; bars show the
-between-replicate standard deviation. See the table below for the full
-statistics.](figures/copepod_fine.png)
-
-Phylogenetic host range and predictive performance across 16 copepod
-genera (90 parasite species). Left: median $`b^*`$ (specialist to
-generalist gradient). Center: median partial-ROC AUC ratio ($`E=0.95`$).
-Right: median hidden-host recovery AUC. Points are genera; bars show the
-between-replicate standard deviation. See the table below for the full
-statistics.
-
-| Genus          |   b\* | AUC ratio | Holdout AUC | SD      | n parasites |
-|:---------------|------:|----------:|------------:|:--------|------------:|
-| Eubrachiella   | 0.007 |      1.97 |       0.998 | \<0.001 |           2 |
-| Colobomatus    | 0.009 |      1.99 |       0.999 | \<0.001 |           3 |
-| Parabrachiella | 0.014 |      1.92 |       0.997 | \<0.001 |           2 |
-| Lernanthropus  | 0.019 |      1.99 |       0.994 | 0.001   |           3 |
-| Chondracanthus | 0.022 |      1.97 |       0.997 | \<0.001 |           3 |
-| Salmincola     | 0.033 |      1.98 |       0.992 | 0.008   |           2 |
-| Taeniacanthus  | 0.038 |      1.98 |       0.998 | \<0.001 |           2 |
-| Hatschekia     | 0.043 |      1.96 |       0.951 | \<0.001 |           2 |
-| Hamaticolax    | 0.075 |      1.83 |       0.833 | 0.059   |           2 |
-| Lernaeenicus   | 0.082 |      1.85 |       0.892 | 0.030   |           3 |
-| Ergasilus      | 0.119 |      1.84 |       0.836 | 0.022   |          17 |
-| Orbitacolax    | 0.133 |      1.80 |       0.830 | 0.076   |           2 |
-| Lepeophtheirus | 0.140 |      1.68 |       0.786 | 0.021   |           8 |
-| Bomolochus     | 0.189 |      1.83 |       0.754 | 0.067   |           3 |
-| Lernaeocera    | 0.222 |      1.74 |       0.778 | 0.123   |           2 |
-| Caligus        | 0.266 |      1.71 |       0.785 | 0.016   |          34 |
-
-Genus-level medians across parasites (fine sweep: 90 parasite species
-with \>= 8 hosts in the tree, 16 genera; hidden-host AUC from 20
-replicates hiding 25% of hosts). {.table}
-
-*Lepeophtheirus* (0.140) and *Caligus* (0.266) sit at the generalist
-half of the gradient; genus summaries based on only two or three
-parasites are illustrative points rather than definitive rankings. Every
-per-parasite partial-ROC curve in the study lies above the null diagonal
-(all bootstrap p = 0), with genus median ratios from 1.58 (*Lernaea*)
-and 1.69-1.71 (*Lepeophtheirus*, *Caligus*) to \>= 1.97 in the
-narrow-range genera.
-
-## 10. Comparison with the Poulin and Mouillot $`S_{TD}`$ specificity index
-
-Across the 90 parasites, $`b^*`$ correlates positively with both
-versions of the Poulin and Mouillot (2003) index: Spearman
-$`\rho = 0.55`$ ($`p = 1.7\times10^{-8}`$) against the continuous
-phylogenetic $`S_{TD}`$ and $`\rho = 0.74`$ ($`p = 6.1\times10^{-17}`$)
-against the classic taxonomic $`S_{TD}`$. The agreement is not perfect —
-*Caligus* has the highest median $`b^*`$ (0.266) but a lower
-phylogenetic $`S_{TD}`$ (1.08) than *Ergasilus* (1.65) or *Lernaeocera*
-(1.78) — reflecting a genuine construct difference: $`b^*`$ rewards
-suitability across a large candidate pool at the fitted threshold, while
-$`S_{TD}`$ only measures how far apart the *realized* hosts are on the
-tree. Notably, phylogenetic $`S_{TD}`$ correlates negatively with both
-the AUC ratio ($`\rho = -0.67`$) and the hidden-host recovery AUC
-($`\rho = -0.69`$), so it works as an a priori indicator of how reliable
-the phylogenetic-distance model will be for a given parasite.
-
-![Phylogenetic host range \$b^\*\$ against the Poulin and Mouillot
-specificity index \$S\_{TD}\$, as the continuous phylogenetic
-generalization (left) and the classic taxonomic 1-4 scale (right).
-Points are individual parasites, colored from specialist (blue) to
-generalist (red) by genus-level median \$b^\*\$; \*Caligus\* is outlined
-because it is the largest genus (34 parasites) and the main case where
-the two constructs disagree.](figures/copepod_poulin_comparison.png)
-
-Phylogenetic host range $`b^*`$ against the Poulin and Mouillot
-specificity index $`S_{TD}`$, as the continuous phylogenetic
-generalization (left) and the classic taxonomic 1-4 scale (right).
-Points are individual parasites, colored from specialist (blue) to
-generalist (red) by genus-level median $`b^*`$; *Caligus* is outlined
-because it is the largest genus (34 parasites) and the main case where
-the two constructs disagree.
-
-## 11. PU learning versus simple phylogenetic baselines
+## 9. PU learning versus simple phylogenetic baselines
 
 The paper also compared the PU classifier against the simplest rules
 using the same information: a nearest-known-host baseline (ranking
@@ -812,7 +720,7 @@ machinery is the bounded suitability score usable across parasites, the
 thresholded host-range summary $`b^*`$, and the presence-only
 performance framework.
 
-## 12. Protocol limit: how many known hosts are needed?
+## 10. Protocol limit: how many known hosts are needed?
 
 Varying the number of training hosts ($`n = 5, 10, 15, 20, 30, 40`$) for
 the best-sampled parasites, the paper found hidden-host AUC near chance
@@ -832,7 +740,7 @@ training hosts for the best-sampled parasites. Points are means over 5
 replicate subsamples; error bars are the between-replicate standard
 deviation. The dashed line marks chance level (AUC = 0.5).
 
-## 13. Predicted novel hosts
+## 11. Predicted novel hosts
 
 The paper’s strongest evidence for added value beyond raw proximity is
 the set of phylogenetically coherent, testable predictions:
