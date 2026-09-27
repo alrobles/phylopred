@@ -103,5 +103,5 @@ pu <- fit_phylopred_pu(beetleTreeInteractions, phy_dist,
 host_threshold_metric(pu$prediction$pred, pu$prediction$is_host)
 #> Phylopred threshold metric f_gamma (gamma = 1)
 #> Optimal threshold: 0.6020  f_gamma: 39.1667
-#> Evaluated at 196 thresholds.
+#> Evaluated at 190 thresholds.
 ```
