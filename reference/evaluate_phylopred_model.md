@@ -83,12 +83,12 @@ evaluate_phylopred_model(pairs)
 #> Pairs: 44460  Parasites: 3
 #> McFadden pseudo-R2: 0.0010
 #> Tjur R2:            0.0011
-#> AUC (in-sample):    0.5223
+#> AUC (in-sample):    0.5225
 evaluate_phylopred_model(pairs, cv = TRUE, k = 3, seed = 42)
 #> Phylopred model evaluation
 #> Pairs: 44460  Parasites: 3
 #> McFadden pseudo-R2: 0.0010
 #> Tjur R2:            0.0011
-#> AUC (in-sample):    0.5223
-#> AUC (grouped CV):   0.4684
+#> AUC (in-sample):    0.5225
+#> AUC (grouped CV):   0.4686
 ```
